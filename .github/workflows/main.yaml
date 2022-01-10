@@ -1,0 +1,39 @@
+
+"on": [push]
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    name: A test job
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Add Resources
+      id: resources
+      uses: mandelsoft/ocm-action@master
+      with:
+        tool_version: snapshot
+        tool_repo: mandelsoft/component-cli
+        action: add_resources
+    - name: Add Component
+      uses: mandelsoft/ocm-action@master
+      with:
+        tool_version: snapshot
+        tool_repo: mandelsoft/component-cli
+        action: add_component
+    - name: Push CTF
+      id: push
+      uses: mandelsoft/ocm-action@master
+      with:
+        tool_version: snapshot
+        tool_repo: mandelsoft/component-cli
+        action: push_ctf
+        comprepo_user: mandelsoft
+        comprepo_password: ${{ secrets.COMPONENTREPO }}
+        comprepo_url: https://ghcr.io/mandelsoft/cnudie
+    - name: Info
+      run: |
+        echo "component name:      ${{ steps.resources.outputs.component-name }}"
+        echo "component version:   ${{ steps.resources.outputs.component-version }}"
+        echo "component directory: ${{ steps.resources.outputs.component-path }}"
+        echo "transport archive:   ${{ steps.push.outputs.transport-archive }}"
